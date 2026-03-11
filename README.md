@@ -199,3 +199,5 @@ Like said before, cookies are time-sensitive. If the script terminates basically
 
 4. Non-existent project/roles indicated in input  
 Of course, the program can't add users to projects that don't exist, or roles within them that don't exist. Check your input data carefully.
+
+Final reminder to leave Docker running before running any of the scripts.

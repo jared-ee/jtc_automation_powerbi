@@ -2,10 +2,10 @@ import json
 import requests
 import csv
 
-from actions.create.create_apis import get_dashboard_url, get_dashboard_headers, get_data_model_roles_url, get_data_model_roles_headers, get_data_model_role_assignments_url, get_data_model_role_assignments_headers, add_user_row_level_security_url, add_user_row_level_security_headers, get_policies_url, get_policies_headers, add_user_security_url, add_user_security_headers
+from actions.create.create_apis import get_dashboard_url, get_dashboard_headers, get_data_model_roles_url, get_data_model_roles_headers, get_data_model_role_assignments_url, get_data_model_role_assignments_headers, add_user_row_level_security_url, add_user_row_level_security_headers, get_policies_url, get_policies_headers, add_user_security_url, add_user_security_headers, get_roles_url, get_roles_headers
 from actions.cookies_utils import get_api_cookies
 
-from data.data import ROW_LEVEL_SECURITY_DATA, SECURITY_DATA, SECURTIY_ROLES_LEGEND
+from data.data import ROW_LEVEL_SECURITY_DATA, SECURITY_DATA
 
 def get_dashboard_id(dashboard_path):
     print("Getting Dashboard")
@@ -124,6 +124,7 @@ def add_users_row_level_security(dashboard):
             role_ids = [rolename_roleid_dict[role_name] for role_name in role_names]
             add_user_row_level_security(powerbi_id, assignments, email, role_ids)
 
+
 def get_policies(powerbi_id):
     print("Getting Policies")
 
@@ -144,15 +145,47 @@ def get_policies(powerbi_id):
         print("Failed to obtain Policies")
         print('--------------')
         return response
+    
+def get_roles(powerbi_id):
+    print("Getting Roles")
 
-def add_user_security(powerbi_id, email, roles, rolename_roledesc_map, policies_response):
+    get_roles_url_refined = get_roles_url.replace('<powerbi_id>', powerbi_id)
+    get_roles_headers['Cookie'] = get_api_cookies()
+
+    response = requests.get(
+        get_roles_url_refined,
+        headers=get_roles_headers
+    )
+
+    print(response)
+    if response.status_code == 200:
+        print("Roles obtained")
+        print('--------------')
+        return response.json()
+    else:
+        print("Failed to obtain Roles")
+        print('--------------')
+        return response
+
+def make_role_desc_map(powerbi_id):
+    role_desc_map = {}
+    response = get_roles(powerbi_id)
+
+    for value in response['value']:
+        name = value["Name"]
+        desc = value["Description"]
+        role_desc_map[name] = desc
+
+    return role_desc_map
+
+def add_user_security(powerbi_id, email, roles, role_desc_map, policies_response):
     print(f"Adding User {email} to Security")
 
     add_user_security_url_refined = add_user_security_url.replace('<powerbi_id>', powerbi_id)
     add_user_security_headers['Cookie'] = get_api_cookies()
     new_user = {
         "GroupUserName": email,
-        "Roles": [{"Name": role, "Description": rolename_roledesc_map[role]} for role in roles]
+        "Roles": [{"Name": role, "Description": role_desc_map[role]} for role in roles]
     }
     payload = {}
     payload["Id"] = policies_response["Id"]
@@ -181,12 +214,7 @@ def add_users_security(dashboard):
     dashboard_path = f'Path=%27/JTC/{dashboard}%27'
     powerbi_id = get_dashboard_id(dashboard_path)
 
-    rolename_roledesc_map = {}
-    with open(SECURTIY_ROLES_LEGEND, newline='') as f:
-        reader = csv.reader(f)
-        next(reader)
-        for r in reader:
-            rolename_roledesc_map[r[0]] = r[1]
+    role_desc_map = make_role_desc_map(powerbi_id)
     
     policies_response = get_policies(powerbi_id)
 
@@ -201,7 +229,7 @@ def add_users_security(dashboard):
             #policies_response = get_policies(powerbi_id)
             email = r[0]
             roles = r[1].split(',')
-            add_user_security(powerbi_id, email, roles, rolename_roledesc_map, policies_response)
+            add_user_security(powerbi_id, email, roles, role_desc_map, policies_response)
 
 
 

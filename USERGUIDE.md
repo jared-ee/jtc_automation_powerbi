@@ -34,18 +34,4 @@ There are 2 fields:
 `roles`: All roles to assign the user for Security. Multiple roles can be assigned per user by indicating multiple roles in this field, separated by commas with no whitespace. To see
 what roles can be assigned for the current project's Security, please check the PowerBI site itself.
 
-### Security Roles Legend
-
-Finally, `security_roles_legend.csv`. 
-
-You may have noticed that when adding users to Security manually on the PowerBI site, there is an additional column titled "Description" when the full list of assignable roles for the new
-user is shown.
-
-Example for the AICAB project dashboard:
-
-![image](docs/images/image-1.png)
-
-Essentially, `security_roles_legend.csv` is to be a copy of the table shown when attempting adding of users on PowerBI. The `role name` column should have all the assignable roles, and their
-corresponding descriptions should be placed in the `role description` column.
-
 # END
