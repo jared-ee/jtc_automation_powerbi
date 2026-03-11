@@ -1,0 +1,6 @@
+﻿role name,role description
+Browser,"May view folders, reports and subscribe to reports."
+Content Manager,"May manage content in the Report Server.  This includes folders, reports and resources."
+My Reports,"May publish reports and linked reports; manage folders, reports and resources in a users My Reports folder."
+Publisher,May publish reports and linked reports to the Report Server.
+Report Builder,May view report definitions.
