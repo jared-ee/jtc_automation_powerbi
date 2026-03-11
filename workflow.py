@@ -5,7 +5,8 @@ import time
 
 from actions.sign_in import sign_in
 from actions.cookies_utils import obtain_cookies, set_cookies
-from actions.create.add_user import add_users_row_level_security, add_users_security
+from actions.create.add_users_row_level_security import add_users_row_level_security
+from actions.create.add_users_security import add_users_security
 
 from data.data import DASHBOARDS, WEBSITES
 
